@@ -4,7 +4,7 @@
 #include <signal.h>
 #include <stdio.h>
 
-#include "Joy.h"
+#include "Xbox.h"
 
 bool interrupted = false;
 bool alarm = false;
@@ -17,23 +17,20 @@ void handle_alarm(int signo) {
   alarm = true;
 }
 
-void print_joy(Joy *joy) {
-  int i;
-  int num_axes = joy->getNumAxes();
-  int num_buttons = joy->getNumButtons();
-
-  for(i = 0; i < num_axes; i++) {
-    printf("axis%d:%.4f ",i, joy->getAxisState(i));
-  }
-  for(i = 0; i < num_buttons; i++) {
-    printf("button%d:%d ",i,(joy->getButtonState(i))?1:0);
-  }
-  printf("\n\n");
+void print_xbox(Xbox *xbox) {
+  printf("L_Joy(x:%.4f,y:%.4f,b:%d)", xbox->getX(LEFT), xbox->getY(LEFT), xbox->getStickPressed(LEFT));
+  printf(" R_Joy(x:%.4f,y:%.4f,b:%d)", xbox->getX(RIGHT), xbox->getY(RIGHT), xbox->getStickPressed(RIGHT));
+  printf(" Trigger(L:%.4f,R:%.4f)", xbox->getTrigger(LEFT), xbox->getTrigger(RIGHT));
+  printf(" Bumper(L:%d,R:%d)", xbox->getBumper(LEFT), xbox->getBumper(RIGHT));
+  printf(" POV(%d)", xbox->getPOV());
+  printf(" (A:%d,B:%d,X:%d,Y:%d)", xbox->getA(), xbox->getB(), xbox->getX(), xbox->getY());
+  printf(" (B:%d,CB:%d,S:%d)", xbox->getBack(), xbox->getCenterButton(), xbox->getStart());
+  printf("\n");
 }
 
 int main() {
   try {
-  Joy joy(0);
+  Xbox xbox(0);
   struct sigaction sa_int, sa_alrm;
   
   sa_int.sa_handler = handle_interrupt;
@@ -66,8 +63,8 @@ int main() {
   while(!interrupted) {
     if(alarm) {
       alarm = false;
-      joy.pollEvents();
-      print_joy(&joy);
+      xbox.pollEvents();
+      print_xbox(&xbox);
     }
     sigsuspend(&open_mask);
   }

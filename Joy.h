@@ -15,8 +15,8 @@ class Joy {
   public:
     Joy(int joynum);
     ~Joy();
-    bool getButtonState(int button_idx);
-    double getAxisState(int axis_idx);
+    bool getRawButton(int button_idx);
+    double getRawAxis(int axis_idx);
     int getNumButtons();
     int getNumAxes();
     void pollEvents();

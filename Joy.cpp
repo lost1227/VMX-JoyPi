@@ -63,14 +63,14 @@ void Joy::pollEvents() {
   }
 }
 
-bool Joy::getButtonState(int button_idx) {
+bool Joy::getRawButton(int button_idx) {
   if(button_idx > num_buttons) {
     throw 8;
   }
   return button_states[button_idx];
 }
 
-double Joy::getAxisState(int axis_idx) {
+double Joy::getRawAxis(int axis_idx) {
   if(axis_idx > num_axes) {
     throw 9;
   }
