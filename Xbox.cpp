@@ -1,4 +1,5 @@
 #include "Xbox.h"
+#include "Exceptions.h"
 
 Xbox::Xbox(int portnum) : Joy(portnum) {}
 
@@ -8,7 +9,7 @@ double Xbox::getX(Hand hand) {
   } else if(hand == LEFT) {
     return this->getRawAxis(0);
   } else {
-    throw 10;
+    throw E_XBOX_INVALID_HAND;
   }
 }
 double Xbox::getY(Hand hand) {
@@ -17,7 +18,7 @@ double Xbox::getY(Hand hand) {
   } else if (hand == LEFT) {
     return -1 * this->getRawAxis(1);
   } else {
-    throw 10;
+    throw E_XBOX_INVALID_HAND;
   }
 }
 double Xbox::getTrigger(Hand hand) {
@@ -26,7 +27,7 @@ double Xbox::getTrigger(Hand hand) {
   } else if(hand == LEFT) {
     return (this->getRawAxis(2) + 1) / 2;
   } else {
-      throw 10;
+      throw E_XBOX_INVALID_HAND;
   }
 }
 
@@ -53,6 +54,8 @@ int Xbox::getPOV() {
   if(y == 1 && x == 0)
     return 360;
   
+  throw E_XBOX_INVALID_POV;
+
   return -1;
 }
 
@@ -62,7 +65,7 @@ bool Xbox::getBumper(Hand hand) {
   } else if(hand == LEFT) {
     return this->getRawButton(4);
   } else {
-    throw 10;
+    throw E_XBOX_INVALID_HAND;
   }
 }
 
@@ -72,7 +75,7 @@ bool Xbox::getStickPressed(Hand hand) {
   } else if(hand == LEFT) {
     return this->getRawButton(9);
   } else {
-    throw 10;
+    throw E_XBOX_INVALID_HAND;
   }
 }
 

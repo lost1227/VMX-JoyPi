@@ -1,4 +1,5 @@
 #include "Joy.h"
+#include "Exceptions.h"
 
 #include <linux/joystick.h>
 
@@ -18,13 +19,13 @@ Joy::Joy(int joynum) {
 
   fd = open(fd_name, O_RDONLY | O_NONBLOCK);
   if(fd < 0) {
-    throw 1;
+    throw E_JOY_OPEN;
   }
   if(ioctl(fd, JSIOCGBUTTONS, &num_buttons) < 0) {
-    throw 2;
+    throw E_JOY_IOCTL_BUTTONS;
   }
   if(ioctl(fd, JSIOCGAXES, &num_axes) < 0) {
-    throw 3;
+    throw E_JOY_IOCTL_AXES;
   }
   
   button_states = new bool[num_buttons];
@@ -46,33 +47,33 @@ void Joy::pollEvents() {
   while(read(fd, &event, sizeof(event)) > 0) {
     if( (event.type & ~JS_EVENT_INIT) == JS_EVENT_BUTTON) {
       if(event.number > num_buttons) {
-        throw 4;
+        throw E_JOY_EVENT_NUMBER_RANGE;
       }
       button_states[event.number] = event.value == 1;
     } else if( (event.type & ~JS_EVENT_INIT) == JS_EVENT_AXIS) {
       if(event.number > num_axes) {
-        throw 5;
+        throw E_JOY_EVENT_NUMBER_RANGE;
       }
       axes_states[event.number] = event.value;
     } else {
-      throw 6;
+      throw E_JOY_EVENT_TYPE;
     }
   }
   if(errno != EAGAIN) {
-    throw 7;
+    throw E_JOY_READ;
   }
 }
 
 bool Joy::getRawButton(int button_idx) {
   if(button_idx > num_buttons) {
-    throw 8;
+    throw E_JOY_BUTTON_IDX_RANGE;
   }
   return button_states[button_idx];
 }
 
 double Joy::getRawAxis(int axis_idx) {
   if(axis_idx > num_axes) {
-    throw 9;
+    throw E_JOY_AXIS_IDX_RANGE;
   }
   return axes_states[axis_idx] / ((double)_MAX_AXIS_VALUE);
 }
