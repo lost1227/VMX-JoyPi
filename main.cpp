@@ -3,8 +3,9 @@
 #include "Exceptions.h"
 #include "Utils.h"
 
-#include <sys/time.h>
 #include <signal.h>
+#include <stdio.h>
+#include <stdint.h>
 
 #define UPDATE_RATE 50 //hz
 
@@ -15,13 +16,14 @@
 
 class Robot {
   private:
-    VMXPi *vmx;
     Xbox *xbox;
     SpeedController *frontLeft;
     SpeedController *frontRight;
     SpeedController *backLeft;
     SpeedController *backRight;
   public:
+    VMXPi *vmx;
+    
     Robot() {
       vmx = new VMXPi(false, UPDATE_RATE);
 
@@ -38,6 +40,7 @@ class Robot {
     }
 
     void stop() {
+      printf("Setting all motors to zero!\n");
       backRight->setSpeed(0);
       backLeft->setSpeed(0);
       frontRight->setSpeed(0);
@@ -58,16 +61,22 @@ class Robot {
     }
 
     void mainLoop() {
-      double m_r = xbox->getX(RIGHT);
-      double t_r = xbox->getY(LEFT);
+      xbox->pollEvents();
 
-      m_r = deadzone(m_r, DEADZONE);
-      t_r = deadzone(t_r, DEADZONE);
+      if(xbox->isConnected()) {
+        double m_r = xbox->getX(RIGHT);
+        double t_r = xbox->getY(LEFT);
 
-      m_r = curve(m_r, CURVE);
-      t_r = curve(t_r, CURVE);
+        m_r = deadzone(m_r, DEADZONE);
+        t_r = deadzone(t_r, DEADZONE);
 
-      this->arcadeDrive(m_r, t_r, SPEED);
+        m_r = curve(m_r, CURVE);
+        t_r = curve(t_r, CURVE);
+
+        this->arcadeDrive(m_r, t_r, SPEED);
+      } else {
+        this->stop();
+      }
     }
 
     ~Robot() {
@@ -81,48 +90,55 @@ class Robot {
 };
 
 bool interrupted = false;
-bool alarm = false;
 
 void handle_signal(int signo) {
   if(signo == SIGINT)
     interrupted = true;
-  else if(signo == SIGALRM)
-    alarm = true;
+}
+
+void run_timer(void *param, uint64_t timestamp_us) {
+  void **param_list = (void **)param;
+  Robot *robot = (Robot *)param_list[0];
+
+  robot->mainLoop();
 }
 
 int main(int argc, char *argv[]) {
+  Robot *robot = NULL;
 
-  Robot robot;
+  try {
+    robot = new Robot;
 
-  struct sigaction sa;
-  
-  sa.sa_handler = handle_signal;
-  sigemptyset(&sa.sa_mask);
-  sa.sa_flags = 0;
-  
-  struct itimerval timer;
-  timer.it_interval.tv_sec = 0;
-  timer.it_interval.tv_usec = 1000/UPDATE_RATE;
-  timer.it_value.tv_sec = 0;
-  timer.it_value.tv_usec = 1000/UPDATE_RATE;
+    struct sigaction sa;
+    
+    sa.sa_handler = handle_signal;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    
+    sigset_t int_mask, open_mask;
+    sigemptyset(&int_mask);
+    sigemptyset(&open_mask);
+    sigaddset(&int_mask, SIGINT);
 
-  sigset_t alarm_mask, open_mask;
-  sigemptyset(&alarm_mask);
-  sigemptyset(&open_mask);
-  sigaddset(&alarm_mask, SIGINT);
-  sigaddset(&alarm_mask, SIGALRM);
+    sigprocmask(SIG_SETMASK, &int_mask, NULL);
 
-  sigprocmask(SIG_SETMASK, &alarm_mask, NULL);
+    sigaction(SIGINT, &sa, NULL);
 
-  sigaction(SIGINT, &sa, NULL);
-  sigaction(SIGALRM, &sa, NULL);
-  setitimer(ITIMER_REAL, &timer, NULL);
+    void *param_list[2];
+    param_list[0] = robot;
+    param_list[1] = NULL;
 
-  while(!interrupted) {
-    if(alarm) {
-      alarm = false;
-      robot.mainLoop();
+    robot->vmx->time.RegisterTimerNotificationRelative(run_timer, 1000000/UPDATE_RATE, (void *)param_list, true);
+
+    while(!interrupted) {
+      sigsuspend(&open_mask);
     }
-    sigsuspend(&open_mask);
+
+    delete robot;
+  } catch (int e) {
+    printf("Exception 0x%02x\n", e);
+    if(robot) {
+      robot->stop();
+    }
   }
 }

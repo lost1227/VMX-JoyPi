@@ -42,7 +42,7 @@ void SpeedController::setSpeed(double speed) {
     speed = 1;
   if (speed < -1)
     speed = -1;
-  double duty_cycle = (speed + 1) * 128;
+  uint8_t duty_cycle = ((speed + 1) / 2) * 255;
   if(!vmx->io.PWMGenerator_SetDutyCycle(pwm_generator, 0, duty_cycle, &vmxerr)) {
     printf("Failed to set DutyCyclDutyCycle for PWMGenerator Resource");
     throw E_SPEED_PWM_SET_DUTY_CYCLE;

@@ -18,14 +18,18 @@ void handle_alarm(int signo) {
 }
 
 void print_xbox(Xbox *xbox) {
-  printf("L_Joy(x:%.4f,y:%.4f,b:%d)", xbox->getX(LEFT), xbox->getY(LEFT), xbox->getStickPressed(LEFT));
-  printf(" R_Joy(x:%.4f,y:%.4f,b:%d)", xbox->getX(RIGHT), xbox->getY(RIGHT), xbox->getStickPressed(RIGHT));
-  printf(" Trigger(L:%.4f,R:%.4f)", xbox->getTrigger(LEFT), xbox->getTrigger(RIGHT));
-  printf(" Bumper(L:%d,R:%d)", xbox->getBumper(LEFT), xbox->getBumper(RIGHT));
-  printf(" POV(%d)", xbox->getPOV());
-  printf(" (A:%d,B:%d,X:%d,Y:%d)", xbox->getA(), xbox->getB(), xbox->getX(), xbox->getY());
-  printf(" (B:%d,CB:%d,S:%d)", xbox->getBack(), xbox->getCenterButton(), xbox->getStart());
-  printf("\n");
+  if(xbox->isConnected()) {
+    printf("L_Joy(x:%.4f,y:%.4f,b:%d)", xbox->getX(LEFT), xbox->getY(LEFT), xbox->getStickPressed(LEFT));
+    printf(" R_Joy(x:%.4f,y:%.4f,b:%d)", xbox->getX(RIGHT), xbox->getY(RIGHT), xbox->getStickPressed(RIGHT));
+    printf(" Trigger(L:%.4f,R:%.4f)", xbox->getTrigger(LEFT), xbox->getTrigger(RIGHT));
+    printf(" Bumper(L:%d,R:%d)", xbox->getBumper(LEFT), xbox->getBumper(RIGHT));
+    printf(" POV(%d)", xbox->getPOV());
+    printf(" (A:%d,B:%d,X:%d,Y:%d)", xbox->getA(), xbox->getB(), xbox->getX(), xbox->getY());
+    printf(" (B:%d,CB:%d,S:%d)", xbox->getBack(), xbox->getCenterButton(), xbox->getStart());
+    printf("\n");
+  } else {
+    printf("Xbox not connected!\n");
+  }
 }
 
 int main() {
@@ -70,7 +74,7 @@ int main() {
   }
   sigprocmask(SIG_SETMASK, &open_mask, NULL);
   } catch (int e) {
-    printf("Error %d\n", e);
+    printf("Error 0x%02x\n", e);
     return e;
   }
   return 0;

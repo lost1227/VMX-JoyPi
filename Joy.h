@@ -7,14 +7,19 @@
 
 class Joy {
   private:
+    bool connected;
+    int joynum;
     int fd;
-    char num_buttons;
-    char num_axes;
+    uint8_t num_buttons;
+    uint8_t num_axes;
     bool *button_states;
     int16_t *axes_states;
+    void connect();
+    void disconnect();
   public:
     Joy(int joynum);
     ~Joy();
+    bool isConnected();
     bool getRawButton(int button_idx);
     double getRawAxis(int axis_idx);
     int getNumButtons();

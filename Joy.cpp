@@ -13,25 +13,29 @@
 #include <errno.h>
 
 Joy::Joy(int joynum) {
-  const char *basename = "/dev/input/js";
-  char *fd_name = new char[strlen(basename) + 4];
-  sprintf(fd_name, "%s%d", basename, joynum);
+  connected = false;
 
-  fd = open(fd_name, O_RDONLY | O_NONBLOCK);
-  if(fd < 0) {
-    throw E_JOY_OPEN;
-  }
-  if(ioctl(fd, JSIOCGBUTTONS, &num_buttons) < 0) {
-    throw E_JOY_IOCTL_BUTTONS;
-  }
-  if(ioctl(fd, JSIOCGAXES, &num_axes) < 0) {
-    throw E_JOY_IOCTL_AXES;
-  }
+  this->joynum = joynum;
+
+  fd = -1;
+
+  num_buttons = 0;
+  num_axes = 0;
   
+  button_states = NULL;
+  axes_states = NULL;
+
   button_states = new bool[num_buttons];
   axes_states = new int16_t[num_axes];
 
-  delete[] fd_name;
+  try {
+    this->connect();
+  } catch(int e) {
+    if(e != E_JOY_OPEN) {
+      throw e;
+    }
+  }
+
 }
 
 Joy::~Joy() {
@@ -41,8 +45,66 @@ Joy::~Joy() {
   close(fd);
 }
 
+void Joy::connect() {
+  const char *basename = "/dev/input/js";
+  char *fd_name = new char[strlen(basename) + 4];
+  sprintf(fd_name, "%s%d", basename, joynum);
+  fd = open(fd_name, O_RDONLY | O_NONBLOCK);
+  delete[] fd_name;
+  if(fd < 0) {
+    throw E_JOY_OPEN;
+  }
+
+  int new_num_buttons, new_num_axes;
+  if(ioctl(fd, JSIOCGBUTTONS, &new_num_buttons) < 0) {
+    throw E_JOY_IOCTL_BUTTONS;
+  }
+  if(ioctl(fd, JSIOCGAXES, &new_num_axes) < 0) {
+    throw E_JOY_IOCTL_AXES;
+  }
+  
+  if(new_num_buttons != num_buttons) {
+    num_buttons = new_num_buttons;
+    if(button_states) {
+      delete[] button_states;
+    }
+    button_states = new bool[num_buttons];
+  }
+  if(new_num_axes != num_axes) {
+    num_axes = new_num_axes;
+    if(axes_states) {
+      delete[] axes_states;
+    }
+    axes_states = new int16_t[num_axes];
+  }
+
+  memset(button_states, 0, num_buttons * sizeof(bool));
+  memset(axes_states, 0, num_axes * sizeof(int16_t));
+  
+  connected = true;
+}
+
+void Joy::disconnect() {
+  connected = false;
+  memset(button_states, 0, num_buttons * sizeof(bool));
+  memset(axes_states, 0, num_axes * sizeof(int16_t));
+
+  close(fd);
+}
+
 void Joy::pollEvents() {
   struct js_event event;
+
+  if(!connected) {
+    try {
+      this->connect();
+    } catch (int e) {
+      if(e == E_JOY_OPEN)
+        return;
+      else
+        throw e;
+    }
+  }
 
   while(read(fd, &event, sizeof(event)) > 0) {
     if( (event.type & ~JS_EVENT_INIT) == JS_EVENT_BUTTON) {
@@ -59,9 +121,17 @@ void Joy::pollEvents() {
       throw E_JOY_EVENT_TYPE;
     }
   }
-  if(errno != EAGAIN) {
+  if(errno == EAGAIN) {
+    return;
+  } else if(errno == ENODEV) {
+    this->disconnect();
+  } else {
     throw E_JOY_READ;
   }
+}
+
+bool Joy::isConnected() {
+  return connected;
 }
 
 bool Joy::getRawButton(int button_idx) {
