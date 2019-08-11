@@ -18,7 +18,7 @@ double curve(double in, double curve) {
     return -powed;
 }
 double map(double in, double inmin, double inmax, double outmin, double outmax) {
-  return ( (in - inmin / inmax) * (outmax - outmin) ) + outmin;
+  return ( ( (in - inmin) / (inmax - inmin) ) * (outmax - outmin) ) + outmin;
 }
 double deadzone(double in, double deadzone) {
   deadzone = abs(deadzone);

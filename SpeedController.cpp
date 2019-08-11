@@ -1,5 +1,5 @@
-#include "SpeedController.h"
 #include "Exceptions.h"
+#include "SpeedController.h"
 
 #include <stdint.h>
 #include <stdio.h>
