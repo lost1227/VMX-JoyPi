@@ -1,0 +1,10 @@
+[Unit]
+Description=VMXPI Robot Code
+
+[Service]
+Type=simple
+User=root
+ExecStart=/home/pi/robot_program/main
+
+[Install]
+WantedBy=multi-user.target

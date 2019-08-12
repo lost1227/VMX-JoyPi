@@ -8,7 +8,7 @@
 bool interrupted = false;
 
 void handle_signal(int signo) {
-  if(signo == SIGINT)
+  if(signo == SIGINT || signo == SIGTERM)
     interrupted = true;
 }
 
@@ -23,10 +23,12 @@ void wait_for_sigint() {
   sigemptyset(&int_mask);
   sigemptyset(&open_mask);
   sigaddset(&int_mask, SIGINT);
+  sigaddset(&int_mask, SIGTERM);
 
   sigprocmask(SIG_SETMASK, &int_mask, NULL);
 
   sigaction(SIGINT, &sa, NULL);
+  sigaction(SIGTERM, &sa, NULL);
 
   printf("Waiting for sigint...\n");
   while(!interrupted) {
