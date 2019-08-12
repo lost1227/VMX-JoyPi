@@ -11,10 +11,12 @@ class SpeedController {
     VMXPi *vmx;
     VMXResourceHandle pwm_generator;
     VMXChannelIndex output_port;
+    bool inverted;
   public:
     SpeedController(VMXPi *vmx, int port);
     ~SpeedController();
     void setSpeed(double speed);
+    void setInverted(bool inverted);
 };
 
 #endif

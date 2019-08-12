@@ -6,6 +6,7 @@
 
 class DifferentialDrive {
   private:
+    bool reversed;
     SpeedController *frontLeft;
     SpeedController *frontRight;
     SpeedController *backLeft;
@@ -16,6 +17,7 @@ class DifferentialDrive {
 
     void arcadeDrive(double moveRequest, double turnRequest, double speedLimiter);
     void stop();
+    void setReversed(bool reversed);
 };
 
 #endif

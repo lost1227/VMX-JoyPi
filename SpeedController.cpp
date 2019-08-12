@@ -34,7 +34,7 @@ SpeedController::SpeedController(VMXPi *vmx, int port) {
     fprintf(stderr, "Failed to set DutyCycle for PWMGenerator Resource");
     throw E_SPEED_PWM_SET_DUTY_CYCLE;
   }
-
+  inverted = false;
 }
 
 SpeedController::~SpeedController() {
@@ -49,6 +49,8 @@ SpeedController::~SpeedController() {
 
 void SpeedController::setSpeed(double speed) {
   VMXErrorCode vmxerr;
+  if(inverted)
+    speed = -1 * speed;
   speed = Utils::clip(speed, -1, 1);
 
   double min_duty_cycle = (1/(1000.0/PWM_FREQ)) * 255;
@@ -59,4 +61,8 @@ void SpeedController::setSpeed(double speed) {
     printf("Failed to set DutyCyclDutyCycle for PWMGenerator Resource");
     throw E_SPEED_PWM_SET_DUTY_CYCLE;
   }
+}
+
+void SpeedController::setInverted(bool inverted) {
+  this->inverted = inverted;
 }

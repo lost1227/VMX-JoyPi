@@ -9,6 +9,7 @@
 Robot::Robot() : TimedRobot() {
   xbox = new Xbox(0);
   drive = new DifferentialDrive(vmx, 0, 1, 2, 3);
+  drive->setReversed(true);
 }
 
 Robot::~Robot() {

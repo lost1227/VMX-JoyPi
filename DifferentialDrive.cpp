@@ -8,6 +8,11 @@ DifferentialDrive::DifferentialDrive(VMXPi *vmx, int frontLeft, int frontRight, 
   this->frontRight = new SpeedController(vmx, frontRight);
   this->backLeft = new SpeedController(vmx, backLeft);
   this->backRight = new SpeedController(vmx, backRight);
+  
+  this->frontRight->setInverted(true);
+  this->backRight->setInverted(true);
+
+  reversed = false;
 }
 
 DifferentialDrive::~DifferentialDrive() {
@@ -22,6 +27,9 @@ void DifferentialDrive::arcadeDrive(double moveRequest, double turnRequest, doub
   moveRequest = Utils::clip(moveRequest, -1, 1);
   turnRequest = Utils::clip(turnRequest, -1, 1);
   speedLimiter = Utils::clip(speedLimiter, 0, 1);
+
+  if(reversed)
+    moveRequest = -1 * moveRequest;
 
   double left = (moveRequest + turnRequest) * speedLimiter;
   double right = (moveRequest - turnRequest) * speedLimiter;
@@ -38,4 +46,8 @@ void DifferentialDrive::stop() {
   backLeft->setSpeed(0);
   frontRight->setSpeed(0);
   backRight->setSpeed(0);
+}
+
+void DifferentialDrive::setReversed(bool reversed) {
+  this->reversed = reversed;
 }
