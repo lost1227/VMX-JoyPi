@@ -13,6 +13,7 @@ class SpeedController {
     VMXChannelIndex output_port;
   public:
     SpeedController(VMXPi *vmx, int port);
+    ~SpeedController();
     void setSpeed(double speed);
 };
 

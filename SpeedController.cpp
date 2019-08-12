@@ -1,5 +1,6 @@
 #include "Exceptions.h"
 #include "SpeedController.h"
+#include "Utils.h"
 
 #include <stdint.h>
 #include <stdio.h>
@@ -36,13 +37,24 @@ SpeedController::SpeedController(VMXPi *vmx, int port) {
 
 }
 
+SpeedController::~SpeedController() {
+  VMXErrorCode vmxerr;
+  if(!vmx->io.DeactivateResource(pwm_generator, &vmxerr)) {
+    printf("Error deactivating pwm resource: %s", GetVMXErrorString(vmxerr));
+  }
+  if(!vmx->io.DeallocateResource(pwm_generator, &vmxerr)) {
+    printf("Error deallocating pwm resource: %s", GetVMXErrorString(vmxerr));
+  }
+}
+
 void SpeedController::setSpeed(double speed) {
   VMXErrorCode vmxerr;
-  if(speed > 1)
-    speed = 1;
-  if (speed < -1)
-    speed = -1;
-  uint8_t duty_cycle = ((speed + 1) / 2) * 255;
+  speed = Utils::clip(speed, -1, 1);
+
+  double min_duty_cycle = (1/(1000.0/PWM_FREQ)) * 255;
+  double max_duty_cycle = (2/(1000.0/PWM_FREQ)) * 255;
+
+  uint8_t duty_cycle = Utils::map(speed, -1, 1, min_duty_cycle, max_duty_cycle);
   if(!vmx->io.PWMGenerator_SetDutyCycle(pwm_generator, 0, duty_cycle, &vmxerr)) {
     printf("Failed to set DutyCyclDutyCycle for PWMGenerator Resource");
     throw E_SPEED_PWM_SET_DUTY_CYCLE;

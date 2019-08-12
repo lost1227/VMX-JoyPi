@@ -1,7 +1,7 @@
 CC = g++
-CFLAGS = -Wall -Werror -pedantic -g -Iinclude
+CFLAGS = -Wall -Werror -Wextra -Wno-unused-parameter -pedantic -Iinclude -march=native -Og -g3 -pipe
 INCLUDE = include
-LINKERFLAGS = -L/usr/local/lib/vmxpi -lvmxpi_hal_cpp -lrt -lpthread -lm
+LINKERFLAGS = -L/usr/local/lib/vmxpi -lvmxpi_hal_cpp -lrt -lpthread -lm -Wl,-O1
 VMXINCLUDE = -I/usr/local/include/vmxpi
 
 BINS = main.o Xbox.o Joy.o SpeedController.o Utils.o DifferentialDrive.o TimedRobot.o Robot.o
@@ -12,7 +12,9 @@ joytest: joytest.o Joy.o Xbox.o
 	$(CC) $(CFLAGS) $(LINKERFLAGS) -o joytest joytest.o Joy.o Xbox.o
 
 main: $(BINS)
-	$(CC) $(CFLAGS) $(LINKERFLAGS) -o main $(BINS)
+	$(CC) $(CFLAGS) $(LINKERFLAGS) -o main $(BINS) ; \
+	sudo chown root:root main ; \
+	sudo chmod 4755 main
 
 joytest.o: joytest.cpp $(INCLUDE)/Xbox.h
 	$(CC) $(CFLAGS) -c joytest.cpp
@@ -26,7 +28,7 @@ Joy.o: Joy.cpp $(INCLUDE)/Joy.h $(INCLUDE)/Exceptions.h
 Xbox.o: Xbox.cpp $(INCLUDE)/Xbox.h $(INCLUDE)/Joy.h $(INCLUDE)/Exceptions.h
 	$(CC) $(CFLAGS) -c Xbox.cpp
 
-SpeedController.o: SpeedController.cpp $(INCLUDE)/SpeedController.h $(INCLUDE)/Exceptions.h
+SpeedController.o: SpeedController.cpp $(INCLUDE)/SpeedController.h $(INCLUDE)/Exceptions.h $(INCLUDE)/Utils.h
 	$(CC) $(CFLAGS) $(VMXINCLUDE) -c SpeedController.cpp
 
 Utils.o: Utils.cpp $(INCLUDE)/Utils.h

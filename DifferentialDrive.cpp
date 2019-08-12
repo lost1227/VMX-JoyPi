@@ -1,6 +1,7 @@
 #include "DifferentialDrive.h"
 #include "SpeedController.h"
 #include "Utils.h"
+#include <stdio.h>
 
 DifferentialDrive::DifferentialDrive(VMXPi *vmx, int frontLeft, int frontRight, int backLeft, int backRight) {
   this->frontLeft = new SpeedController(vmx, frontLeft);
@@ -18,9 +19,9 @@ DifferentialDrive::~DifferentialDrive() {
 }
 
 void DifferentialDrive::arcadeDrive(double moveRequest, double turnRequest, double speedLimiter) {
-  moveRequest = clip(moveRequest, -1, 1);
-  turnRequest = clip(turnRequest, -1, 1);
-  speedLimiter = clip(speedLimiter, 0, 1);
+  moveRequest = Utils::clip(moveRequest, -1, 1);
+  turnRequest = Utils::clip(turnRequest, -1, 1);
+  speedLimiter = Utils::clip(speedLimiter, 0, 1);
 
   double left = (moveRequest + turnRequest) * speedLimiter;
   double right = (moveRequest - turnRequest) * speedLimiter;
@@ -32,6 +33,7 @@ void DifferentialDrive::arcadeDrive(double moveRequest, double turnRequest, doub
 }
 
 void DifferentialDrive::stop() {
+  printf("Stopping motors!\n");
   frontLeft->setSpeed(0);
   backLeft->setSpeed(0);
   frontRight->setSpeed(0);

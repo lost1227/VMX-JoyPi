@@ -37,7 +37,7 @@ void wait_for_sigint() {
 }
 
 
-int main(int argc, char *argv[]) {
+int main() {
   Robot *robot = NULL;
 
   try {

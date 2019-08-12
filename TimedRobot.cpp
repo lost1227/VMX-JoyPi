@@ -10,9 +10,13 @@ void timer_notify_handler(void *param, uint64_t timestamp_us) {
 }
 
 TimedRobot::TimedRobot() {
+  VMXErrorCode vmxerr;
   vmx = new VMXPi(PERIODIC_RATE_HZ, false);
   if(!vmx->IsOpen()) {
     throw E_VMX_NOT_OPEN;
+  }
+  if(!vmx->io.DeallocateAllResources(&vmxerr)) {
+    printf("Error deallocating all resources: %s\n", GetVMXErrorString(vmxerr));
   }
 }
 

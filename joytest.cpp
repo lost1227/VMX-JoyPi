@@ -9,12 +9,11 @@
 bool interrupted = false;
 bool alarm = false;
 
-void handle_interrupt(int signo) {
-   interrupted = true;
-}
-
-void handle_alarm(int signo) {
-  alarm = true;
+void handle_signal(int signo) {
+  if(signo == SIGINT)
+    interrupted = true;
+  if(signo == SIGALRM)
+    alarm = true;
 }
 
 void print_xbox(Xbox *xbox) {
@@ -37,11 +36,11 @@ int main() {
   Xbox xbox(0);
   struct sigaction sa_int, sa_alrm;
   
-  sa_int.sa_handler = handle_interrupt;
+  sa_int.sa_handler = handle_signal;
   sigemptyset(&sa_int.sa_mask);
   sa_int.sa_flags = 0;
   
-  sa_alrm.sa_handler = handle_alarm;
+  sa_alrm.sa_handler = handle_signal;
   sigemptyset(&sa_alrm.sa_mask);
   sigaddset(&sa_alrm.sa_mask, SIGALRM);
   sa_alrm.sa_flags = 0;

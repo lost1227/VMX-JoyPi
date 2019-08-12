@@ -23,11 +23,11 @@ void Robot::robotPeriodic() {
     double m_r = xbox->getY(LEFT);
     double t_r = xbox->getX(RIGHT);
 
-    m_r = deadzone(m_r, DEADZONE);
-    t_r = deadzone(t_r, DEADZONE);
+    m_r = Utils::deadzone(m_r, DEADZONE);
+    t_r = Utils::deadzone(t_r, DEADZONE);
 
-    m_r = curve(m_r, CURVE);
-    t_r = curve(t_r, CURVE);
+    m_r = Utils::curve(m_r, CURVE);
+    t_r = Utils::curve(t_r, CURVE);
 
     printf("m_r:%.2f t_r:%.2f\n", m_r, t_r);
 
