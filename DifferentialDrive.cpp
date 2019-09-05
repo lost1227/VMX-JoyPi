@@ -15,6 +15,17 @@ DifferentialDrive::DifferentialDrive(VMXPi *vmx, int frontLeft, int frontRight, 
   reversed = false;
 }
 
+DifferentialDrive::DifferentialDrive(VMXPi *vmx, int left, int right) {
+  this->frontLeft = new SpeedController(vmx, left);
+  this->frontRight = new SpeedController(vmx, right);
+  this->backLeft = NULL;
+  this->backRight = NULL;
+
+  this->frontRight->setInverted(true);
+
+  reversed = false;
+}
+
 DifferentialDrive::~DifferentialDrive() {
   this->stop();
   delete frontLeft;
@@ -34,18 +45,26 @@ void DifferentialDrive::arcadeDrive(double moveRequest, double turnRequest, doub
   double left = (moveRequest + turnRequest) * speedLimiter;
   double right = (moveRequest - turnRequest) * speedLimiter;
 
-  frontLeft->setSpeed(left);
-  backLeft->setSpeed(left);
-  frontRight->setSpeed(right);
-  backRight->setSpeed(right);
+  if(frontLeft)
+    frontLeft->setSpeed(left);
+  if(backLeft)
+    backLeft->setSpeed(left);
+  if(frontRight)
+    frontRight->setSpeed(right);
+  if(backRight)
+    backRight->setSpeed(right);
 }
 
 void DifferentialDrive::stop() {
   printf("Stopping motors!\n");
-  frontLeft->setSpeed(0);
-  backLeft->setSpeed(0);
-  frontRight->setSpeed(0);
-  backRight->setSpeed(0);
+  if(frontLeft)
+    frontLeft->setSpeed(0);
+  if(backLeft)
+    backLeft->setSpeed(0);
+  if(frontRight)
+    frontRight->setSpeed(0);
+  if(backRight)
+    backRight->setSpeed(0);
 }
 
 void DifferentialDrive::setReversed(bool reversed) {

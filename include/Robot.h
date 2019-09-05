@@ -4,11 +4,13 @@
 #include "TimedRobot.h"
 #include "Xbox.h"
 #include "DifferentialDrive.h"
+#include "SpikeRelay.h"
 
 class Robot : public TimedRobot {
   private:
     Xbox *xbox;
     DifferentialDrive *drive;
+    SpikeRelay *horn;
   public:
     Robot();
     ~Robot();

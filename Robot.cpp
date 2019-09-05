@@ -8,13 +8,16 @@
 
 Robot::Robot() : TimedRobot() {
   xbox = new Xbox(0);
-  drive = new DifferentialDrive(vmx, 0, 1, 2, 3);
+  drive = new DifferentialDrive(vmx, 0, 1);
   drive->setReversed(true);
+
+  horn = new SpikeRelay(vmx, 2, 3);
 }
 
 Robot::~Robot() {
   delete xbox;
   delete drive;
+  delete horn;
 }
 
 void Robot::robotPeriodic() {
@@ -30,9 +33,18 @@ void Robot::robotPeriodic() {
     m_r = Utils::curve(m_r, CURVE);
     t_r = Utils::curve(t_r, CURVE);
 
-    printf("m_r:%.2f t_r:%.2f\n", m_r, t_r);
+    //printf("m_r:%.2f t_r:%.2f\n", m_r, t_r);
 
     drive->arcadeDrive(m_r, t_r, SPEED);
+
+    bool honk = xbox->getA();
+
+    if(honk) {
+      horn->set(SpikeRelay::forward);
+    } else {
+      horn->set(SpikeRelay::off);
+    }
+
   } else {
     printf("Xbox controller disconnected\n");
     drive->stop();
