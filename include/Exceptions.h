@@ -22,4 +22,6 @@
 
 #define E_VMX_NOT_OPEN 0x31
 
+#define E_VOLT_READ 0x40
+
 #endif

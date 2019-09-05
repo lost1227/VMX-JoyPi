@@ -4,7 +4,7 @@ INCLUDE = include
 LINKERFLAGS = -L/usr/local/lib/vmxpi -lvmxpi_hal_cpp -lrt -lpthread -lm -Wl,-O1
 VMXINCLUDE = -I/usr/local/include/vmxpi
 
-BINS = main.o Xbox.o Joy.o SpeedController.o Utils.o DifferentialDrive.o TimedRobot.o Robot.o SpikeRelay.o
+BINS = main.o Xbox.o Joy.o SpeedController.o Utils.o DifferentialDrive.o TimedRobot.o Robot.o SpikeRelay.o VoltageMonitor.o
 
 all: joytest main
 
@@ -45,6 +45,9 @@ Robot.o: Robot.cpp $(INCLUDE)/*.h
 
 SpikeRelay.o: SpikeRelay.cpp $(INCLUDE)/SpikeRelay.h $(INCLUDE)/Exceptions.h
 	$(CC) $(CFLAGS) $(VMXINCLUDE) -c SpikeRelay.cpp
+
+VoltageMonitor.o: VoltageMonitor.cpp $(INCLUDE)/VoltageMonitor.h $(INCLUDE)/Exceptions.h
+	$(CC) $(CFLAGS) $(VMXINCLUDE) -c VoltageMonitor.cpp
 
 clean:
 	rm -f *.o joytest main

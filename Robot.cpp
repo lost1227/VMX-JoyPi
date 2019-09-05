@@ -12,16 +12,25 @@ Robot::Robot() : TimedRobot() {
   drive->setReversed(true);
 
   horn = new SpikeRelay(vmx, 2, 3);
+  volt = new VoltageMonitor(vmx);
 }
 
 Robot::~Robot() {
   delete xbox;
   delete drive;
   delete horn;
+  delete volt;
 }
 
 void Robot::robotPeriodic() {
   xbox->pollEvents();
+
+  if(volt->check_voltage()) {
+    fprintf(stderr, "Undervolt detected!\n");
+    horn->set(SpikeRelay::off);
+    drive->stop();
+    return;
+  }
 
   if(xbox->isConnected()) {
     double m_r = xbox->getY(LEFT);
@@ -47,6 +56,7 @@ void Robot::robotPeriodic() {
 
   } else {
     printf("Xbox controller disconnected\n");
+    horn->set(SpikeRelay::off);
     drive->stop();
   }
 }
