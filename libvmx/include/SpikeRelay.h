@@ -3,6 +3,9 @@
 
 #include "VMXPi.h"
 
+/**
+ * See https://web.archive.org/web/20030419143006/http://www.innovationfirst.com/FirstRobotics/pdfs/SpikeBLUEUsersManual.pdf
+ */
 class SpikeRelay {
   private:
     VMXPi *vmx;

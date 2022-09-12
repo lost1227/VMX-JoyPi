@@ -35,16 +35,16 @@ int main() {
   try {
   Xbox xbox(0);
   struct sigaction sa_int, sa_alrm;
-  
+
   sa_int.sa_handler = handle_signal;
   sigemptyset(&sa_int.sa_mask);
   sa_int.sa_flags = 0;
-  
+
   sa_alrm.sa_handler = handle_signal;
   sigemptyset(&sa_alrm.sa_mask);
   sigaddset(&sa_alrm.sa_mask, SIGALRM);
   sa_alrm.sa_flags = 0;
-  
+
   struct itimerval timer;
   timer.it_interval.tv_sec = 0;
   timer.it_interval.tv_usec = 20;
@@ -72,9 +72,9 @@ int main() {
     sigsuspend(&open_mask);
   }
   sigprocmask(SIG_SETMASK, &open_mask, NULL);
-  } catch (int e) {
-    printf("Error 0x%02x\n", e);
-    return e;
+  } catch (std::exception& e) {
+    printf("Error: %s\n", e.what());
+    return 1;
   }
   return 0;
 }

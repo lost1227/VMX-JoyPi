@@ -13,7 +13,7 @@ TimedRobot::TimedRobot() {
   VMXErrorCode vmxerr;
   vmx = new VMXPi(PERIODIC_RATE_HZ, false);
   if(!vmx->IsOpen()) {
-    throw E_VMX_NOT_OPEN;
+    throw std::runtime_error("VMX is not open");
   }
   if(!vmx->io.DeallocateAllResources(&vmxerr)) {
     printf("Error deallocating all resources: %s\n", GetVMXErrorString(vmxerr));

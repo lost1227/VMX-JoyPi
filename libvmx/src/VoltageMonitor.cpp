@@ -15,7 +15,7 @@ bool VoltageMonitor::check_voltage() {
 
   if(!vmx->power.GetSystemVoltage(voltage, &vmxerr)) {
     fprintf(stderr, "Could not read voltage\n");
-    throw E_VOLT_READ;
+    throw std::runtime_error("Unknown VMX error when reading system voltage");
   }
 
   if(voltage < CUTOFF_VOLTAGE) {

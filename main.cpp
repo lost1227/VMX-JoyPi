@@ -1,5 +1,8 @@
 #include "Robot.h"
 
+#include <memory>
+#include <exception>
+
 #include <signal.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -18,7 +21,7 @@ void wait_for_sigint() {
   sa.sa_handler = handle_signal;
   sigemptyset(&sa.sa_mask);
   sa.sa_flags = 0;
-  
+
   sigset_t int_mask, open_mask;
   sigemptyset(&int_mask);
   sigemptyset(&open_mask);
@@ -40,16 +43,13 @@ void wait_for_sigint() {
 
 
 int main() {
-  Robot *robot = NULL;
+  std::unique_ptr<Robot> robot;
 
   try {
-    robot = new Robot;
+    robot = std::unique_ptr<Robot>(new Robot);
     robot->start();
     wait_for_sigint();
-    delete robot;
-  } catch (int e) {
-    printf("Exception 0x%02x\n", e);
-    if(robot)
-      delete robot;
+  } catch (std::exception& e) {
+    printf("Exception: %s\n", e.what());
   }
 }
