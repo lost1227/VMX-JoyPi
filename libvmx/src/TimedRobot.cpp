@@ -11,7 +11,7 @@ void timer_notify_handler(void *param, uint64_t timestamp_us) {
 
 TimedRobot::TimedRobot() {
   VMXErrorCode vmxerr;
-  vmx = new VMXPi(PERIODIC_RATE_HZ, false);
+  vmx = new VMXPi(false, PERIODIC_RATE_HZ);
   if(!vmx->IsOpen()) {
     throw std::runtime_error("VMX is not open");
   }
