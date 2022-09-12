@@ -1,5 +1,4 @@
-#ifndef _VOLTAGE_MONITOR_H
-#define _VOLTAGE_MONITOR_H
+#pragma once
 
 #include <stdint.h>
 
@@ -17,4 +16,3 @@ class VoltageMonitor {
     bool check_voltage();
 };
 
-#endif

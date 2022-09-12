@@ -1,5 +1,5 @@
-#ifndef _UTILS_H
-#define _UTILS_H
+#pragma once
+
 class Utils {
   public:
     static double clip(double in, double min, double max);
@@ -8,4 +8,3 @@ class Utils {
     static double deadzone(double in, double deadzone);
 };
 
-#endif

@@ -1,5 +1,4 @@
-#ifndef _XBOX_H
-#define _XBOX_H
+#pragma once
 
 #include "Joy.h"
 
@@ -26,4 +25,3 @@ class Xbox : public Joy {
     bool getCenterButton();
 };
 
-#endif

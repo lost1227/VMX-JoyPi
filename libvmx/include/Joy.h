@@ -1,5 +1,4 @@
-#ifndef _JOY_H
-#define _JOY_H
+#pragma once
 
 #include <stdint.h>
 
@@ -26,5 +25,3 @@ class Joy {
     int getNumAxes();
     void pollEvents();
 };
-
-#endif

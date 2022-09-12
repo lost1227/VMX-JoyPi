@@ -1,5 +1,4 @@
-#ifndef _TIMED_ROBOT_H
-#define _TIMED_ROBOT_H
+#pragma once
 
 #include "VMXPi.h"
 
@@ -18,4 +17,3 @@ class TimedRobot {
     virtual void robotPeriodic() = 0;
 };
 
-#endif

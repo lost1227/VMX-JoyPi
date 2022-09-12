@@ -1,5 +1,4 @@
-#ifndef _SPIKE_RELAY_H
-#define _SPIKE_RELAY_H
+#pragma once
 
 #include "VMXPi.h"
 
@@ -17,4 +16,3 @@ class SpikeRelay {
     void set(Value value);
 };
 
-#endif

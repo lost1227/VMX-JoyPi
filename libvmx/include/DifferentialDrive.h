@@ -1,5 +1,4 @@
-#ifndef _DIFFERENTIAL_DRIVE_H
-#define _DIFFERENTIAL_DRIVE_H
+#pragma once
 
 #include "VMXPi.h"
 #include "SpeedController.h"
@@ -20,5 +19,3 @@ class DifferentialDrive {
     void stop();
     void setReversed(bool reversed);
 };
-
-#endif

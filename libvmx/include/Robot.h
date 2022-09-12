@@ -1,5 +1,4 @@
-#ifndef _ROBOT_H
-#define _ROBOT_H
+#pragma once
 
 #include "TimedRobot.h"
 #include "Xbox.h"
@@ -20,4 +19,3 @@ class Robot : public TimedRobot {
     void robotPeriodic();
 };
 
-#endif

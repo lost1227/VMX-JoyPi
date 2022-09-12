@@ -1,5 +1,4 @@
-#ifndef _SPEED_CONTROLLER_H
-#define _SPEED_CONTROLLER_H
+#pragma once
 
 #include "VMXPi.h"
 
@@ -19,4 +18,3 @@ class SpeedController {
     void setInverted(bool inverted);
 };
 
-#endif
