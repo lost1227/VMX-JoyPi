@@ -1,11 +1,13 @@
 #include "TimedRobot.h"
 #include "Exceptions.h"
+#include "Watchdog.h"
 
 #include <stdio.h>
 #include <stdint.h>
 
 void timer_notify_handler(void *param, uint64_t timestamp_us) {
   TimedRobot *robot = (TimedRobot *)param;
+  Watchdog::feed_watchdog();
   robot->robotPeriodic();
 }
 
