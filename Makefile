@@ -1,53 +1,38 @@
-CC = g++
-CFLAGS = -Wall -Werror -Wextra -Wno-unused-parameter -pedantic -Iinclude -march=native -Og -g3 -pipe
-INCLUDE = include
-LINKERFLAGS = -L/usr/local/lib/vmxpi -lvmxpi_hal_cpp -lrt -lpthread -lm -Wl,-O1
-VMXINCLUDE = -I/usr/local/include/vmxpi
+.SUFFIXES:
 
-BINS = main.o Xbox.o Joy.o SpeedController.o Utils.o DifferentialDrive.o TimedRobot.o Robot.o SpikeRelay.o VoltageMonitor.o
+CXX = g++
+CXXFLAGS = -Wall -Werror -Wextra -std=c++11 -pedantic -march=native -pipe
+CXXFLAGS += -g -Og -g3
+#CXXFLAGS += -O3
+
+INCLUDE =  -Ilibvmx/include -I/home/jordan/include/vmxpi
+#INCLUDE =  -Ilibvmx/include -I/usr/local/include/vmxpi
+
+LINKERFLAGS = -L/usr/local/lib/vmxpi -lvmxpi_hal_cpp -lrt -lpthread -lm -Wl,-O1
+
+LIBVMX := libvmx/libvmx.a
+
+COMPILE.cpp = $(CXX) $(CXXFLAGS) -c
 
 all: joytest main
 
-joytest: joytest.o Joy.o Xbox.o
-	$(CC) $(CFLAGS) $(LINKERFLAGS) -o joytest joytest.o Joy.o Xbox.o
+joytest: joytest.o $(LIBVMX)
+	$(CXX) $(CXXFLAGS) $(LINKERFLAGS) joytest.o $(LIBVMX) -o joytest
 
-main: $(BINS)
-	$(CC) $(CFLAGS) $(LINKERFLAGS) -o main $(BINS) ; \
-	sudo chown root:root main ; \
+main: main.o $(LIBVMX)
+	$(CXX) $(CXXFLAGS) $(LINKERFLAGS) main.o $(LIBVMX) -o main
+	sudo chown root:root main
 	sudo chmod 4755 main
 
-joytest.o: joytest.cpp $(INCLUDE)/Xbox.h
-	$(CC) $(CFLAGS) -c joytest.cpp
+%.d: %.cpp
+	$(CXX) $(CXXFLAGS) -MM -MP -MF $@ $(INCLUDE) $<
 
-main.o: main.cpp $(INCLUDE)/*.h
-	$(CC) $(CFLAGS) $(VMXINCLUDE) -c main.cpp
+%.o : %.cpp %.d
+	$(COMPILE.cpp) $(INCLUDE) $(OUTPUT_OPTION) $<
 
-Joy.o: Joy.cpp $(INCLUDE)/Joy.h $(INCLUDE)/Exceptions.h
-	$(CC) $(CFLAGS) -c Joy.cpp
-
-Xbox.o: Xbox.cpp $(INCLUDE)/Xbox.h $(INCLUDE)/Joy.h $(INCLUDE)/Exceptions.h
-	$(CC) $(CFLAGS) -c Xbox.cpp
-
-SpeedController.o: SpeedController.cpp $(INCLUDE)/SpeedController.h $(INCLUDE)/Exceptions.h $(INCLUDE)/Utils.h
-	$(CC) $(CFLAGS) $(VMXINCLUDE) -c SpeedController.cpp
-
-Utils.o: Utils.cpp $(INCLUDE)/Utils.h
-	$(CC) $(CFLAGS) -c Utils.cpp
-
-DifferentialDrive.o: DifferentialDrive.cpp $(INCLUDE)/DifferentialDrive.h $(INCLUDE)/SpeedController.h $(INCLUDE)/Utils.h
-	$(CC) $(CFLAGS) $(VMXINCLUDE) -c DifferentialDrive.cpp
-
-TimedRobot.o: TimedRobot.cpp $(INCLUDE)/TimedRobot.h $(INCLUDE)/Exceptions.h
-	$(CC) $(CFLAGS) $(VMXINCLUDE) -c TimedRobot.cpp
-
-Robot.o: Robot.cpp $(INCLUDE)/*.h
-	$(CC) $(CFLAGS) $(VMXINCLUDE) -c Robot.cpp
-
-SpikeRelay.o: SpikeRelay.cpp $(INCLUDE)/SpikeRelay.h $(INCLUDE)/Exceptions.h
-	$(CC) $(CFLAGS) $(VMXINCLUDE) -c SpikeRelay.cpp
-
-VoltageMonitor.o: VoltageMonitor.cpp $(INCLUDE)/VoltageMonitor.h $(INCLUDE)/Exceptions.h
-	$(CC) $(CFLAGS) $(VMXINCLUDE) -c VoltageMonitor.cpp
+DEPFILES := joytest.d main.d
+$(DEPFILES):
+include $(wildcard $(DEPFILES))
 
 clean:
-	rm -f *.o joytest main
+	rm -f *.o *.d joytest main
